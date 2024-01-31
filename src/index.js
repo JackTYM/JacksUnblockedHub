@@ -17,6 +17,7 @@ import { createServer } from "node:http";
 import { hostname } from "node:os";
 import path from "node:path";
 import fs from "fs";
+import mime from "mime";
 import { ppid } from "node:process";
 import { WebSocketServer, WebSocket } from 'ws';
 const wss = new WebSocketServer({ port: 8081 });
@@ -37,7 +38,6 @@ app.use(
 app.use(express.static(path.join(__dirname, "html")));
 
 app.get('/scripts/*', (req, res) => {   
-    console.log(req.url)
     res.sendFile(path.join(__dirname, "static", req.url));
 })
 
@@ -141,22 +141,6 @@ const startTime = Date.now()
 var totalBytes = 0;
 
 server.on("request", (req, res) => {
-    let dataReceived = 0;
-
-    req.on('data', (chunk) => {
-        dataReceived += chunk.length;
-    });
-
-    req.on('end', () => {
-        totalBytes += dataReceived;
-        if (dataReceived > 5000) {
-            console.log(req.url)
-            console.log(`Received ${dataReceived} bytes of data from ${req.method} ${req.url}`);
-            console.log(req.headers['x-bare-path'])
-            console.log(`Total Bytes: ${totalBytes} | Seconds: ${(Date.now() - startTime) / 1000}`)
-            console.log(`Bytes per second: ${totalBytes / ((Date.now() - startTime) / 1000)}`)
-        }
-    });
     if (bare.shouldRoute(req)) {
         bare.routeRequest(req, res);
     } else {
@@ -165,18 +149,6 @@ server.on("request", (req, res) => {
 });
 
 server.on("upgrade", (req, socket, head) => {
-    let dataReceived = 0;
-
-    req.on('data', (chunk) => {
-        dataReceived += chunk.length;
-    });
-
-    req.on('end', () => {
-        if (dataReceived > 5000) {
-            console.log(req.url)
-            console.log(`Upgraded ${dataReceived} bytes of data from ${req.method} ${req.url}`);
-        }
-    });
     if (bare.shouldRoute(req)) {
         bare.routeUpgrade(req, socket, head);
     } else {
@@ -260,6 +232,20 @@ function httpsWorker(glx) {
     });
 
     glx.serveApp(function (req, res) {
+        if (config.externalSites[req.headers.host]) {
+            if (req.url == "/") {
+                req.url = "/index.html"
+            }
+            const stream = fs.createReadStream(path.join(config.externalSites[req.headers.host], req.url));
+            stream.on("open", () => {
+                res.setHeader("Content-Type", mime.lookup(stream.path) || 'application/octet-stream');
+                stream.pipe(res);
+            });
+            stream.on("error", (error) => {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end("404 Not Found");
+            });
+        }
         if (bare.shouldRoute(req)) {
             bare.routeRequest(req, res);
         } else {
