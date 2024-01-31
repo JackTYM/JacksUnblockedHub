@@ -1,1 +1,15 @@
-node_modules
+# Node modules
+node_modules/
+
+# Specific configuration files and folders
+./config.json
+./logs.txt
+greenlock.d/accounts/
+greenlock.d/live/
+greenlock.d/config.json
+greenlock.d/config.json.bak
+src/old.js
+src/oldish.js
+
+# Specific folder in html directory
+html/Games/Emulation/
