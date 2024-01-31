@@ -1,0 +1,21 @@
+{
+    "slurs": [
+        "faggot",
+        "fag",
+        "beaner",
+        "nigger",
+        "niger",
+        "nig",
+        "tranny",
+        "coon",
+        "chink",
+        "chinx",
+        "dyke"
+    ],
+    "adminPasswords": {
+        "ExamplePassword": "adminName"
+    },
+    "externalSites": {
+        "example.com": "/root/example.com/"
+    }
+}

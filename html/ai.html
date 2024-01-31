@@ -1,0 +1,99 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <link rel="stylesheet" href="ai.css">
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat">
+            <div class="chat-header">
+                <h2>AI Chatbot</h2>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- Chat messages will be displayed here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatMessages = document.getElementById('chat-messages');
+
+        const chat_id = makeid()
+
+        async function get_response() {
+            if (chatMessages.lastChild.innerHTML != null && chatMessages.lastChild.innerHTML.startsWith("Bot: ")) {
+                const response = await (await fetch(`/gpt?chat_id=${chat_id}`, {
+                    timeout: 3000
+                })).json()
+
+                console.log(response)
+            }
+        }
+
+        setInterval(get_response, 1000)
+
+        sendButton.addEventListener('click', () => {
+            const userMessage = userInput.value.trim();
+            if (userMessage === '') return;
+
+            // Display the user's message in the chat
+            displayMessage(userMessage, 'User');
+            displayMessage("", 'Bot');
+
+            fetch("/gpt", {
+                method: "POST",
+                body: JSON.stringify({
+                    chat_id: chat_id,
+                    message: userMessage,
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                timeout: 3000
+            })
+
+            // Clear the input field
+            userInput.value = '';
+        });
+
+        function displayMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.textContent = `${sender}: ${message}`;
+            chatMessages.appendChild(messageDiv);
+
+            // Scroll to the bottom of the chat window
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateBotResponse(userMessage) {
+            // Replace this with your AI chatbot logic to generate responses
+            // For simplicity, let's echo the user's message as the bot's response
+            return `Bot: ${userMessage}`;
+        }
+
+        function makeid() {
+            let result = '';
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const charactersLength = characters.length;
+            let counter = 0;
+            while (counter < 20) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                counter += 1;
+            }
+            return result;
+        }
+    </script>
+</body>
+
+</html>

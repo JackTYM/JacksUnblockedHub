@@ -18,8 +18,18 @@
   "dependencies": {
     "@titaniumnetwork-dev/ultraviolet": "^2.0.0",
     "@tomphttp/bare-server-node": "^2.0.0",
+    "acme-dns-01-namecheap": "^3.0.1",
+    "chatgpt": "^5.2.5",
     "express": "^4.18.2",
-    "ultraviolet-static": "github:titaniumnetwork-dev/Ultraviolet-Static"
+    "express-http-proxy": "^2.0.0",
+    "express-static-gzip": "^2.1.7",
+    "greenlock-express": "^4.0.3",
+    "http-proxy": "^1.18.1",
+    "https": "^1.0.0",
+    "openai": "^4.10.0",
+    "request": "^2.88.2",
+    "ultraviolet-static": "github:titaniumnetwork-dev/Ultraviolet-Static",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "eslint": "^8.36.0",
