@@ -2,8 +2,8 @@
 node_modules/
 
 # Specific configuration files and folders
-./config.json
-./logs.txt
+config.json
+logs.txt
 greenlock.d/accounts/
 greenlock.d/live/
 greenlock.d/config.json
